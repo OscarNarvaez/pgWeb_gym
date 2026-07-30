@@ -1,2 +1,7 @@
+# ffmpeg-static descarga su binario en un postinstall. Se permite porque
+# `npm run frames` lo necesita para extraer los frames del video.
+#
+# El despliegue no lo usa: el workflow instala con --ignore-scripts y se apoya
+# en los frames ya versionados en public/frames.
 allowBuilds:
-  ffmpeg-static: set this to true or false
+  ffmpeg-static: true

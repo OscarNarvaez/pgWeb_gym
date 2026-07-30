@@ -1,0 +1,61 @@
+# Construye el sitio y publica dist/ en GitHub Pages.
+#
+# Sin esto, Pages sirve la raiz del repo: el navegador recibe el index.html
+# fuente de Vite, con los marcadores <!--@sections--> sin reemplazar, sin CSS y
+# apuntando a /src/main.js. Eso es exactamente lo que se veia roto.
+#
+# Requiere que en Settings > Pages la fuente sea "GitHub Actions", no una rama.
+
+name: Deploy a GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Deja terminar un despliegue en curso antes de empezar otro, en vez de
+# cancelarlo a medias y dejar el sitio en un estado indefinido.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # --ignore-scripts evita el postinstall de ffmpeg-static, que baja ~70 MB
+      # de binario. El build no lo necesita: los frames ya estan versionados en
+      # public/frames y solo se regeneran a mano con `npm run frames`.
+      - name: Instalar dependencias
+        run: npm ci --ignore-scripts
+
+      - name: Construir
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

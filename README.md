@@ -147,9 +147,34 @@ contenido real está en el DOM, no dibujado).
 
 ## Despliegue
 
-Es un sitio estático. `npm run build` y se sube `dist/` a Netlify, Vercel o GitHub
-Pages. `base: './'` en `vite.config.js` hace que funcione también en subcarpetas.
+Es un sitio estático: lo que se publica es `dist/`, no la raíz del repo.
 
-`public/frames/` se versiona en git para que el hosting no tenga que correr ffmpeg.
-Si prefieres no versionarlo, agrégalo a `.gitignore` y corre `npm run frames` como
-parte del build del hosting.
+### GitHub Pages
+
+`.github/workflows/deploy.yml` construye y publica en cada push a `main`.
+
+**Hay que configurarlo una vez:** en *Settings → Pages → Build and deployment*,
+poner **Source: GitHub Actions**. Si queda en "Deploy from a branch", Pages sirve
+la raíz del repo y el navegador recibe el `index.html` fuente de Vite: con los
+marcadores `<!--@sections-->` sin reemplazar, sin CSS y apuntando a `/src/main.js`.
+La página sale en blanco con 404 en `main.js`, `poster.jpg` y los frames.
+
+El sitio queda en una subcarpeta (`/pgWeb_gym/`) y eso funciona porque
+`vite.config.js` usa `base: './'`: todas las rutas salen relativas al documento.
+
+El workflow instala con `npm ci --ignore-scripts` para saltarse el postinstall de
+`ffmpeg-static`, que baja ~70 MB de binario. El build no lo necesita: los frames
+ya están versionados y solo se regeneran a mano con `npm run frames`.
+
+### Otros hostings
+
+`npm run build` y subir `dist/`. En Netlify o Vercel: build command `npm run build`,
+publish directory `dist`.
+
+### Sobre los frames versionados
+
+`public/frames/` está en git para que el hosting no tenga que correr ffmpeg. El
+costo es que cada cambio de video suma ~28 MB al historial, para siempre. Si vas a
+iterar mucho el video, conviene agregarlo a `.gitignore` y correr `npm run frames`
+como parte del build (hay que quitar `--ignore-scripts` del workflow para que
+`ffmpeg-static` baje su binario).
