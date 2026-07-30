@@ -1,0 +1,793 @@
+/*
+ * Layout de las 9 secciones.
+ *
+ * El lado de cada bloque de texto no es decorativo: sale de medir la luminancia
+ * del video por tercios en cada tramo. El texto siempre cae sobre la mitad más
+ * oscura del encuadre, para no pelear con el sujeto ni con las luces del fondo.
+ * `data-scrim` gradúa el degradado según qué tan claro es ese tramo.
+ */
+
+.track {
+  position: relative;
+  z-index: var(--z-content);
+}
+
+.section {
+  position: relative;
+  min-height: 130vh;
+}
+
+/* El contenido se pega mientras el tramo termina de recorrerse: el video avanza
+   y el texto se sostiene, en vez de barrer la pantalla. */
+.section__inner {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  padding: clamp(4.5rem, 10vh, 7rem) var(--gutter) clamp(3.5rem, 8vh, 5rem);
+}
+
+/* El indicador lateral de nivel vive sobre el borde derecho: las secciones que
+   alinean a la derecha tienen que dejarle espacio o el texto queda debajo. */
+@media (min-width: 769px) {
+  .section[data-side='right'] .section__inner,
+  .section[data-side='full'] .section__inner {
+    padding-right: calc(var(--gutter) + 6rem);
+  }
+}
+
+/* ---------- Scrims ---------- */
+
+/* Cuelga del contenedor sticky, no de la sección: así viaja con el texto. */
+.section__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.section[data-scrim='soft'] {
+  --scrim-edge: 0.82;
+  --scrim-mid: 0.4;
+}
+
+.section[data-scrim='medium'] {
+  --scrim-edge: 0.9;
+  --scrim-mid: 0.58;
+}
+
+/* Tramo 8 es la única zona clara del metraje (luma 54-62/255): necesita más. */
+.section[data-scrim='strong'] {
+  --scrim-edge: 0.95;
+  --scrim-mid: 0.78;
+}
+
+.section[data-side='left'] .section__scrim {
+  background: linear-gradient(
+    to right,
+    rgb(var(--ink-rgb) / var(--scrim-edge)) 0%,
+    rgb(var(--ink-rgb) / var(--scrim-mid)) 38%,
+    transparent 72%
+  );
+}
+
+.section[data-side='right'] .section__scrim {
+  background: linear-gradient(
+    to left,
+    rgb(var(--ink-rgb) / var(--scrim-edge)) 0%,
+    rgb(var(--ink-rgb) / var(--scrim-mid)) 38%,
+    transparent 72%
+  );
+}
+
+.section[data-side='full'] .section__scrim {
+  background: rgb(var(--ink-rgb) / var(--scrim-edge));
+}
+
+/* ---------- Colocación en la grilla ---------- */
+
+.section__content {
+  display: grid;
+  gap: var(--stack);
+  width: 100%;
+  max-width: 34rem;
+}
+
+.section[data-side='left'] .section__content {
+  justify-self: start;
+}
+
+.section[data-side='right'] .section__content {
+  justify-self: end;
+}
+
+.section[data-side='full'] .section__content {
+  justify-self: center;
+  max-width: 62rem;
+}
+
+/* ---------- Tipografía de sección ---------- */
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--aqua);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: var(--aqua);
+}
+
+.section__title {
+  font-size: var(--step-3);
+}
+
+.section__lead {
+  color: var(--paper-dim);
+  max-width: 46ch;
+}
+
+.section__note {
+  font-size: var(--step--1);
+  color: var(--paper-faint);
+  border-left: 2px solid var(--aqua-line);
+  padding-left: 0.8rem;
+}
+
+/* ---------- Hero ---------- */
+
+.hero__title {
+  font-size: var(--step-5);
+  line-height: 0.88;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+.hero__title em {
+  display: block;
+  font-style: normal;
+  /* El color plano queda de respaldo si background-clip: text no se aplica. */
+  color: var(--aqua);
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  width: fit-content;
+}
+
+.hero__tagline {
+  font-size: var(--step-1);
+  color: var(--paper-dim);
+  max-width: 30ch;
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+/* ---------- Botones ---------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out),
+    border-color 0.25s var(--ease-out), translate 0.25s var(--ease-out);
+}
+
+.btn:hover {
+  translate: 0 -2px;
+}
+
+.btn--primary {
+  background: var(--aqua);
+  color: var(--ink-900);
+}
+
+.btn--primary:hover {
+  background: var(--aqua-bright);
+}
+
+.btn--ghost {
+  border-color: rgb(var(--paper-rgb) / 0.28);
+  color: var(--paper);
+}
+
+.btn--ghost:hover {
+  border-color: var(--aqua);
+  color: var(--aqua);
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  flex: none;
+}
+
+/* ---------- Filosofía ---------- */
+
+.philosophy__body {
+  display: grid;
+  gap: 1rem;
+  color: var(--paper-dim);
+}
+
+.philosophy__body p:first-child {
+  font-size: var(--step-1);
+  color: var(--paper);
+}
+
+/* ---------- Listas de bloques (instalaciones, beneficios) ---------- */
+
+.blocks {
+  display: grid;
+  gap: 1px;
+  background: rgb(var(--paper-rgb) / 0.12);
+  border: 1px solid rgb(var(--paper-rgb) / 0.12);
+  border-radius: var(--radius);
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+}
+
+.blocks--two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.blocks__item {
+  background: rgb(var(--surface-rgb) / 0.72);
+  padding: 1rem 1.1rem;
+  display: grid;
+  gap: 0.25rem;
+  backdrop-filter: blur(6px);
+}
+
+.blocks__name {
+  font-size: var(--step-0);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.blocks__detail {
+  font-size: var(--step--1);
+  color: var(--paper-dim);
+  line-height: 1.45;
+}
+
+/* ---------- Programas ---------- */
+
+.programs {
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+  counter-reset: program;
+}
+
+.program {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem 1.1rem;
+  background: rgb(var(--surface-rgb) / 0.7);
+  border: 1px solid rgb(var(--paper-rgb) / 0.12);
+  /* Reposo en azul, hover en aqua: el borde marca el estado con los dos acentos. */
+  border-left: 2px solid var(--blue-line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(6px);
+  transition: border-left-color 0.3s var(--ease-out), background 0.3s var(--ease-out);
+}
+
+.program:hover {
+  border-left-color: var(--aqua);
+  background: rgb(var(--surface-rgb) / 0.9);
+}
+
+.program__name {
+  counter-increment: program;
+  font-size: var(--step-1);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.program__name::before {
+  content: '0' counter(program);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--aqua);
+}
+
+.program__detail {
+  font-size: var(--step--1);
+  color: var(--paper-dim);
+  line-height: 1.5;
+}
+
+.program__for {
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+/* ---------- Planes ---------- */
+
+/*
+ * Diez plazos por tres columnas de grupo. Va como tabla porque son datos
+ * tabulares: en tarjetas no cabrían en la pantalla y el precio perdería la
+ * referencia de a qué columna pertenece.
+ */
+.pricing {
+  margin-top: 0.4rem;
+  border: 1px solid rgb(var(--paper-rgb) / 0.14);
+  border-radius: var(--radius);
+  background: rgb(var(--surface-rgb) / 0.78);
+  backdrop-filter: blur(6px);
+  /* Última red de seguridad: si la tabla no cabe, se desplaza dentro de su caja
+     en vez de reventar el ancho de la página. */
+  overflow-x: auto;
+}
+
+.pricing table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.pricing th,
+.pricing td {
+  padding: 0.5rem 0.75rem;
+  text-align: right;
+  font-size: var(--step--1);
+  white-space: nowrap;
+}
+
+.pricing thead th {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--aqua);
+  border-bottom: 1px solid rgb(var(--paper-rgb) / 0.16);
+}
+
+.pricing tbody th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--paper);
+}
+
+.pricing tbody td {
+  color: var(--paper-dim);
+}
+
+.pricing thead th:first-child,
+.pricing tbody th {
+  text-align: left;
+}
+
+.pricing tbody tr + tr th,
+.pricing tbody tr + tr td {
+  border-top: 1px solid rgb(var(--paper-rgb) / 0.08);
+}
+
+.pricing tbody tr[data-featured='true'] {
+  background: var(--blue-tint);
+}
+
+.pricing tbody tr[data-featured='true'] th,
+.pricing tbody tr[data-featured='true'] td {
+  color: var(--paper);
+  font-weight: 700;
+}
+
+.pricing__na {
+  color: var(--paper-faint) !important;
+}
+
+.pricing__legend {
+  font-size: 0.72rem;
+  color: var(--paper-faint);
+  margin-top: 0.15rem;
+}
+
+/* ---------- FAQ ---------- */
+
+.faq {
+  display: grid;
+  gap: 1px;
+  background: rgb(var(--paper-rgb) / 0.12);
+  border: 1px solid rgb(var(--paper-rgb) / 0.12);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 0.4rem;
+}
+
+.faq__item {
+  background: rgb(var(--surface-rgb) / 0.74);
+  backdrop-filter: blur(6px);
+}
+
+.faq__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  font-size: var(--step-0);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.faq__q::-webkit-details-marker {
+  display: none;
+}
+
+.faq__q:hover {
+  color: var(--aqua);
+}
+
+.faq__q::after {
+  content: '';
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-right: 1.5px solid var(--aqua);
+  border-bottom: 1.5px solid var(--aqua);
+  rotate: 45deg;
+  translate: 0 -3px;
+  transition: rotate 0.3s var(--ease-out);
+}
+
+.faq__item[open] .faq__q::after {
+  rotate: -135deg;
+  translate: 0 3px;
+}
+
+.faq__a {
+  padding: 0 1.1rem 1rem;
+  font-size: var(--step--1);
+  color: var(--paper-dim);
+  line-height: 1.55;
+  max-width: 52ch;
+}
+
+/* ---------- Horarios ---------- */
+
+.hours {
+  display: grid;
+  gap: 1px;
+  background: rgb(var(--paper-rgb) / 0.14);
+  border: 1px solid rgb(var(--paper-rgb) / 0.14);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 0.4rem;
+}
+
+.hours__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  background: rgb(var(--ink-rgb) / 0.82);
+  backdrop-filter: blur(6px);
+}
+
+.hours__day {
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+}
+
+.hours__detail {
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+.hours__time {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--aqua);
+  white-space: nowrap;
+}
+
+/* Cerrado en gris, no en el color de acento: no es un horario al que venir. */
+.hours__closed {
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+.hours__row[data-closed='true'] .hours__day {
+  color: var(--paper-dim);
+}
+
+/* ---------- Clases dirigidas ---------- */
+
+.classes__title {
+  margin-top: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--aqua);
+}
+
+.classes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1px;
+  background: rgb(var(--paper-rgb) / 0.12);
+  border: 1px solid rgb(var(--paper-rgb) / 0.12);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.classes__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.6rem 1rem;
+  background: rgb(var(--ink-rgb) / 0.82);
+  backdrop-filter: blur(6px);
+  font-size: var(--step--1);
+}
+
+.classes__name {
+  font-weight: 600;
+}
+
+.classes__when {
+  color: var(--paper-faint);
+}
+
+.classes__time {
+  font-variant-numeric: tabular-nums;
+  color: var(--aqua);
+  white-space: nowrap;
+}
+
+/* ---------- Contacto ---------- */
+
+.contact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+
+.contact__details {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.contact__group {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.contact__label {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+.contact__value {
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  line-height: 1.3;
+}
+
+a.contact__value {
+  transition: color 0.2s var(--ease-out);
+}
+
+a.contact__value:hover {
+  color: var(--aqua);
+}
+
+.contact__map {
+  border: 1px solid rgb(var(--paper-rgb) / 0.16);
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--ink-700);
+}
+
+.contact__map iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  /* El embed de Google llega en claro; se integra al esquema oscuro del sitio. */
+  filter: invert(0.92) hue-rotate(180deg) saturate(0.6) contrast(0.92);
+}
+
+.footer {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1.5rem;
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgb(var(--paper-rgb) / 0.14);
+  font-size: var(--step--1);
+  color: var(--paper-faint);
+}
+
+.footer a {
+  color: var(--paper-dim);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--aqua);
+}
+
+/* ---------- Móvil ---------- */
+
+@media (max-width: 768px) {
+  .section {
+    min-height: 130vh;
+  }
+
+  /*
+   * Se centra en vez de anclar abajo: las secciones densas (planes, preguntas)
+   * son más altas que la pantalla y anclarlas al pie las empujaba por encima de
+   * la barra superior. Centrado, el bloque crece hacia ambos lados y el padding
+   * reserva el alto de la barra arriba y del botón de WhatsApp abajo.
+   */
+  .section__inner {
+    align-content: center;
+    padding: 5.5rem var(--gutter) 6.5rem;
+  }
+
+  /* En móvil el sujeto ocupa el ancho completo: el texto baja y el scrim sube. */
+  .section[data-side] .section__scrim {
+    background: linear-gradient(
+      to top,
+      rgb(var(--ink-rgb) / 0.94) 0%,
+      rgb(var(--ink-rgb) / 0.9) 55%,
+      rgb(var(--ink-rgb) / 0.62) 82%,
+      rgb(var(--ink-rgb) / 0.4) 100%
+    );
+  }
+
+  .section[data-side] .section__content {
+    justify-self: stretch;
+    max-width: none;
+  }
+
+  .blocks--two {
+    grid-template-columns: 1fr;
+  }
+
+  .contact {
+    grid-template-columns: 1fr;
+  }
+
+  .contact__map {
+    aspect-ratio: 16 / 11;
+  }
+
+  /* Cuatro columnas en 390 px: se recorta el aire y se encoge la cifra para que
+     la tabla entre entera sin desplazamiento horizontal. */
+  .pricing th,
+  .pricing td {
+    padding: 0.42rem 0.4rem;
+    font-size: 0.72rem;
+  }
+
+  .pricing thead th {
+    font-size: 0.56rem;
+    letter-spacing: 0.06em;
+  }
+
+  .classes__row {
+    grid-template-columns: 1fr auto;
+    row-gap: 0.1rem;
+  }
+
+  .classes__name {
+    grid-column: 1;
+  }
+
+  .classes__time {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .classes__when {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 0.68rem;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+/*
+ * Sin animación no hay scrub, así que el fondo pasa a ser el poster estático y
+ * las secciones se leen como una página normal: sin sticky, sin altura extra.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .section {
+    min-height: 0;
+  }
+
+  .section__inner {
+    position: static;
+    min-height: 0;
+    padding-block: clamp(3rem, 8vh, 5rem);
+  }
+
+  .section__scrim {
+    background: rgb(var(--ink-rgb) / 0.88) !important;
+  }
+
+  .stage__poster {
+    display: block;
+  }
+
+  .scroll-hint {
+    display: none;
+  }
+}

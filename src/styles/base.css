@@ -1,0 +1,471 @@
+/* Reset acotado + chrome fijo: canvas, loader, nav e indicador de nivel. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--ink-900);
+  color: var(--paper);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Lenis toma el control del scroll; sin esto el navegador pelea con la inercia. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* Mientras cargan los primeros frames el scroll queda bloqueado. */
+body[data-locked='true'] {
+  overflow: hidden;
+}
+
+img,
+svg,
+canvas,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.02;
+  text-wrap: balance;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 2px solid var(--aqua);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: var(--z-loader);
+  padding: 0.7rem 1.1rem;
+  background: var(--aqua);
+  color: var(--ink-900);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transform: translateY(-150%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ---------- Canvas de fondo ---------- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-canvas);
+  background: var(--ink-900);
+}
+
+.stage__canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fondo estático para prefers-reduced-motion, cuando no se carga la secuencia. */
+.stage__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+/*
+ * Viñeta global. El video ya es oscuro (luma media 23/255), así que apenas hace
+ * falta: solo cierra los bordes para que el texto no compita con las luces del
+ * fondo. Los scrims por sección hacen el trabajo pesado.
+ */
+.stage__vignette {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scrim);
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 50%, transparent 40%, rgb(var(--ink-rgb) / 0.55) 100%),
+    linear-gradient(to bottom, rgb(var(--ink-rgb) / 0.7) 0%, transparent 22%, transparent 78%, rgb(var(--ink-rgb) / 0.8) 100%);
+}
+
+/* ---------- Loader ---------- */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loader);
+  display: grid;
+  place-content: center;
+  gap: 1.5rem;
+  background: var(--ink-900);
+  transition: opacity 0.6s var(--ease-out), visibility 0.6s;
+}
+
+.loader[hidden] {
+  display: grid;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader__mark {
+  font-size: var(--step-2);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-align: center;
+}
+
+.loader__mark span {
+  color: var(--aqua);
+}
+
+.loader__bar {
+  width: min(48vw, 260px);
+  height: 2px;
+  background: var(--ink-600);
+  overflow: hidden;
+}
+
+.loader__fill {
+  height: 100%;
+  width: 0%;
+  background: var(--grad-brand);
+  transition: width 0.25s linear;
+}
+
+.loader__pct {
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  color: var(--paper-faint);
+  text-align: center;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Barra superior ---------- */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-chrome);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(0.9rem, 2vw, 1.6rem) var(--gutter);
+  background: linear-gradient(to bottom, rgb(var(--ink-rgb) / 0.75), transparent);
+  pointer-events: none;
+}
+
+.topbar > * {
+  pointer-events: auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-weight: 800;
+  font-size: var(--step-1);
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand__up {
+  color: var(--aqua);
+}
+
+.brand__suffix {
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+/* ---------- Indicador de nivel ---------- */
+
+.levels {
+  position: fixed;
+  right: clamp(0.9rem, 2vw, 1.8rem);
+  top: 50%;
+  translate: 0 -50%;
+  z-index: var(--z-chrome);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  align-items: flex-end;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.levels__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.levels__link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  padding: 0.15rem 0;
+}
+
+.levels__label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+  opacity: 0;
+  translate: 6px 0;
+  transition: opacity 0.3s var(--ease-out), translate 0.3s var(--ease-out);
+  white-space: nowrap;
+}
+
+.levels__dash {
+  width: 18px;
+  height: 2px;
+  background: var(--paper-faint);
+  opacity: 0.4;
+  transition: width 0.35s var(--ease-out), background 0.35s var(--ease-out),
+    opacity 0.35s var(--ease-out);
+}
+
+.levels__link:hover .levels__label,
+.levels__link:focus-visible .levels__label,
+.levels__item[aria-current='true'] .levels__label {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.levels__item[aria-current='true'] .levels__dash {
+  width: 34px;
+  background: var(--aqua);
+  opacity: 1;
+}
+
+.levels__counter {
+  margin-top: 0.7rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.levels__counter b {
+  color: var(--aqua);
+  font-weight: 700;
+}
+
+/* ---------- Botón flotante de WhatsApp ---------- */
+
+.wa-float {
+  position: fixed;
+  top: clamp(0.6rem, 1.5vw, 1.05rem);
+  left: 50%;
+  z-index: var(--z-chrome);
+  /* El centrado usa `translate`, no `transform`: así el latido se queda con
+     `transform` para sí solo y no hay que repetir el -50% en cada keyframe. */
+  translate: -50% 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.25rem;
+  background: var(--aqua);
+  color: var(--ink-900);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border-radius: 999px;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.5);
+  animation: wa-beat 2.6s ease-in-out infinite;
+  transition: box-shadow 0.3s var(--ease-out), scale 0.3s var(--ease-out);
+}
+
+/* Anillo que se expande hacia afuera. Refuerza el latido sin ocupar más sitio
+   ni desplazar nada: el pseudo-elemento no participa del layout. */
+.wa-float::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--aqua);
+  animation: wa-ring 2.6s var(--ease-out) infinite;
+  pointer-events: none;
+}
+
+/*
+ * Doble golpe con pausa larga, como un pulso real. Solo se anima `transform` y
+ * `opacity`, que el navegador resuelve en el compositor: una animación infinita
+ * sobre cualquier otra propiedad competiría con el redibujado de los frames.
+ */
+@keyframes wa-beat {
+  0%,
+  44%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.07);
+  }
+  16% {
+    transform: scale(1);
+  }
+  24% {
+    transform: scale(1.05);
+  }
+  32% {
+    transform: scale(1);
+  }
+}
+
+@keyframes wa-ring {
+  0% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+/* Con el puntero encima el botón ya tiene la atención: el latido sobra y
+   distrae al hacer click. `animation: none` en vez de pausar, para que no quede
+   congelado a media escala. */
+.wa-float:hover,
+.wa-float:focus-visible {
+  animation: none;
+  scale: 1.06;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 0.6);
+}
+
+.wa-float:hover::after,
+.wa-float:focus-visible::after {
+  animation: none;
+  opacity: 0;
+}
+
+/* Sin animación el anillo no se desvanece y queda como un borde fijo pegado al
+   botón, que se lee como un error de diseño. Mejor no dibujarlo. */
+@media (prefers-reduced-motion: reduce) {
+  .wa-float::after {
+    display: none;
+  }
+}
+
+.wa-float svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  flex: none;
+}
+
+/* ---------- Hint de scroll ---------- */
+
+.scroll-hint {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1rem, 3vh, 2.2rem);
+  translate: -50% 0;
+  z-index: var(--z-chrome);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.scroll-hint__rail {
+  width: 1px;
+  height: 42px;
+  background: linear-gradient(to bottom, var(--aqua), transparent);
+}
+
+@media (max-width: 768px) {
+  .levels {
+    display: none;
+  }
+
+  /* La marca suelta el sufijo: con el botón centrado arriba, "Fitness-GYM" era
+     justo lo que se cruzaba con el borde izquierdo del pill. */
+  .brand__suffix {
+    display: none;
+  }
+
+  .wa-float {
+    padding: 0.6rem 1rem;
+  }
+}

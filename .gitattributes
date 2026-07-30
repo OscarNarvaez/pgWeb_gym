@@ -1,0 +1,10 @@
+# Normaliza los finales de linea en el repo para que clonar desde Windows, macOS
+# o Linux no genere diffs fantasma en todo el proyecto.
+* text=auto eol=lf
+
+# Los assets del video son binarios: git no debe intentar convertirlos ni
+# mostrarlos como texto en los diffs.
+*.mp4 binary
+*.webp binary
+*.jpg binary
+*.png binary

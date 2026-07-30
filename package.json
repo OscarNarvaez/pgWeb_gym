@@ -1,0 +1,21 @@
+{
+  "name": "levelup-Fitness-GYM",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Landing de Level Up - Fitness-GYM con scroll ligado al video",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "frames": "node scripts/extract-frames.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.18"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "vite": "^8.1.5"
+  }
+}

@@ -1,0 +1,78 @@
+/*
+ * Tokens de diseño.
+ *
+ * Paleta: #12D6D2 (aqua), #1781B3 (azul), #FFFFFF (texto) sobre base casi negra.
+ * La base es oscura porque el video fuente lo es: luma media 23/255, casi negro
+ * en los laterales. El negro lleva un tinte frío mínimo para no chocar con los
+ * dos acentos.
+ *
+ * Reparto por contraste sobre la base, no por gusto:
+ *  - aqua 11.2:1  -> acento principal, sirve incluso para texto pequeño
+ *  - azul  4.7:1  -> bordes, fondos teñidos y superficies; no para texto chico
+ *  - Un botón azul con texto blanco daría 4.35:1, bajo AA. Por eso los botones
+ *    primarios son aqua con texto oscuro.
+ *
+ * Los tokens *-rgb existen para poder pedir opacidad sin repetir el color:
+ * rgb(var(--ink-rgb) / 0.82).
+ */
+
+:root {
+  /* Tripletas para componer con alfa */
+  --ink-rgb: 4 8 12;
+  --surface-rgb: 9 15 22;
+  --paper-rgb: 255 255 255;
+  --aqua-rgb: 18 214 210;
+  --blue-rgb: 23 129 179;
+
+  /* Base */
+  --ink-900: rgb(var(--ink-rgb));
+  --ink-800: #070c12;
+  --ink-700: #0e1620;
+  --ink-600: #17212d;
+  --ink-500: #223040;
+
+  /* Texto */
+  --paper: #ffffff;
+  --paper-dim: rgb(var(--paper-rgb) / 0.72);
+  --paper-faint: rgb(var(--paper-rgb) / 0.52);
+
+  /* Acento principal */
+  --aqua: #12d6d2;
+  --aqua-bright: #5ce6e3;
+  --aqua-dim: rgb(var(--aqua-rgb) / 0.16);
+  --aqua-line: rgb(var(--aqua-rgb) / 0.34);
+
+  /* Acento secundario */
+  --blue: #1781b3;
+  --blue-tint: rgb(var(--blue-rgb) / 0.16);
+  --blue-line: rgb(var(--blue-rgb) / 0.5);
+
+  /* Degradado de marca, usa los dos acentos */
+  --grad-brand: linear-gradient(120deg, var(--aqua), var(--blue));
+
+  /* Tipografía */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+
+  --step--1: clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem);
+  --step-0: clamp(0.95rem, 0.9rem + 0.25vw, 1.06rem);
+  --step-1: clamp(1.12rem, 1rem + 0.5vw, 1.35rem);
+  --step-2: clamp(1.4rem, 1.15rem + 1.1vw, 2rem);
+  --step-3: clamp(1.8rem, 1.35rem + 1.9vw, 2.8rem);
+  --step-4: clamp(2.6rem, 1.6rem + 4.4vw, 5.6rem);
+  --step-5: clamp(3.2rem, 1.6rem + 7vw, 8rem);
+
+  /* Espaciado */
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --stack: clamp(0.9rem, 1.6vw, 1.5rem);
+
+  /* Capas */
+  --z-canvas: 0;
+  --z-scrim: 1;
+  --z-content: 2;
+  --z-chrome: 10;
+  --z-loader: 100;
+
+  --radius: 4px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
