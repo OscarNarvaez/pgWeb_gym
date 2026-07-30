@@ -673,6 +673,55 @@ a.contact__value:hover {
   color: var(--aqua);
 }
 
+/*
+ * Firma de autoria. `flex-basis: 100%` la baja a su propia linea dentro del
+ * footer, en vez de repartirse el espacio con el copyright y las redes: es de
+ * otra persona que el resto del pie, y mezclarla se leia como un enlace mas.
+ */
+.footer__credit {
+  flex-basis: 100%;
+  margin-top: 0.5rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgb(var(--paper-rgb) / 0.08);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--paper-faint);
+}
+
+/* Selector con `a` para ganarle en especificidad a `.footer a`, que si no
+   pinta la firma del mismo gris que el resto de enlaces del pie. */
+.footer a.footer__author {
+  position: relative;
+  color: var(--aqua);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+}
+
+/* Subrayado que crece desde la izquierda. Va en un pseudo-elemento y no en
+   text-decoration para poder animar solo transform. */
+.footer__author::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: var(--grad-brand);
+  scale: 0 1;
+  transform-origin: left;
+  transition: scale 0.35s var(--ease-out);
+}
+
+.footer__author:hover::after,
+.footer__author:focus-visible::after {
+  scale: 1 1;
+}
+
+.footer a.footer__author:hover {
+  color: var(--aqua-bright);
+}
+
 /* ---------- Móvil ---------- */
 
 @media (max-width: 768px) {

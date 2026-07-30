@@ -282,6 +282,7 @@ function renderContact(layout) {
               <div class="footer">
                 <p>© <span data-year>2026</span> ${esc(site.nameFull)} · ${esc(site.address.city)}, ${esc(site.address.region)}</p>
                 <p><a href="${esc(site.instagram.url)}" target="_blank" rel="noopener">Instagram</a> · <a href="${esc(site.whatsapp.href)}" target="_blank" rel="noopener">WhatsApp</a></p>
+                <p class="footer__credit">Diseñado por <a class="footer__author" href="${esc(site.author.url)}" target="_blank" rel="noopener">${esc(site.author.name)}</a></p>
               </div>
             </div>`,
   );

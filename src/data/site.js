@@ -50,6 +50,12 @@ export const site = {
     url: 'https://www.instagram.com/levelup_gym_/',
     handle: '@levelup_gym_',
   },
+
+  /** Firma de quien diseñó el sitio, en el pie. */
+  author: {
+    name: 'ZOKY',
+    url: 'https://www.linkedin.com/in/oscar-julian-narvaez-5b144120b/',
+  },
 };
 
 site.address.full = `${site.address.street}, ${site.address.building}, ${site.address.city}, ${site.address.region}`;
